@@ -1,0 +1,80 @@
+"use client";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import type { TimelineAction } from "@/lib/types";
+import { MONTH_NAMES } from "@/lib/monthNames";
+import { dismissMonthlyModal } from "@/lib/storage";
+
+type MonthlyModalProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  year: number;
+  month: number;
+  actions: TimelineAction[];
+};
+
+export function MonthlyModal({
+  open,
+  onOpenChange,
+  year,
+  month,
+  actions,
+}: MonthlyModalProps) {
+  const label = MONTH_NAMES[month - 1];
+
+  function handleGotIt() {
+    dismissMonthlyModal(year, month);
+    onOpenChange(false);
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        hideClose
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="max-h-[85vh] overflow-y-auto"
+      >
+        <DialogHeader>
+          <DialogTitle>It&apos;s {label}</DialogTitle>
+          <DialogDescription className="text-base text-stone-600">
+            Here&apos;s what your dad would remind you to do this month:
+          </DialogDescription>
+        </DialogHeader>
+        {actions.length === 0 ? (
+          <p className="text-sm text-stone-500">
+            Nothing on your playbook for this month — enjoy the calm, and
+            check back next month.
+          </p>
+        ) : (
+          <ul className="space-y-3 text-left">
+            {actions.map((a) => (
+              <li
+                key={a.id}
+                className="rounded-xl border border-stone-200/80 bg-white/80 px-3 py-2.5"
+              >
+                <p className="font-semibold text-playbook-green">{a.title}</p>
+                <p className="mt-1 text-sm text-stone-500">{a.explanation}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button
+          type="button"
+          className="mt-2 w-full"
+          onClick={handleGotIt}
+        >
+          Got it
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
