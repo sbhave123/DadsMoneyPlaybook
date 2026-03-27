@@ -15,11 +15,14 @@ When explaining financial concepts:
 - Use dollar examples tied to their income level
 - Explain the tax benefit in plain English
 - End every explanation with: "Bottom line: [one sentence action]"
+ - Keep guidance factual and educational, not personalized legal/tax advice
+ - When legal/tax rules are mentioned, cite the rule type plainly (for example "IRS contribution limits", "wash-sale rule")
 
 The user is asking about: ${actionItemTitle}
 Their financial profile: ${JSON.stringify(profile)}
 
-Start by explaining why this action matters RIGHT NOW for their specific situation, then walk them through exactly how to do it step by step.`;
+Start by explaining why this action matters RIGHT NOW for their specific situation, then walk them through exactly how to do it step by step.
+Close with a short reminder: "Educational only — verify with official IRS/employer plan docs."`;
 }
 
 export async function POST(req: NextRequest) {

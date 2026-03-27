@@ -8,6 +8,7 @@ export type OnboardingAnswers = {
   employerMatch401k: EmployerMatch401k;
   hsaEligible: HsaEligible;
   incomeAbove161k: IncomeAbove161k;
+  salaryAnnual: number;
   taxBracket: TaxBracket;
   taxableBrokerage: TaxableBrokerage;
 };
@@ -18,4 +19,11 @@ export type TimelineAction = {
   day: number;
   title: string;
   explanation: string;
+};
+
+export type ActionStage = "not_started" | "in_progress" | "completed";
+
+export type SessionUser = {
+  firstName: string;
+  email: string;
 };

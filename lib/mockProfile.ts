@@ -1,10 +1,15 @@
 import type { OnboardingAnswers } from "./types";
+import { estimateTaxBracketFromSalary } from "./tax";
 
-/** Sample profile for demos, Storybook-style testing, or seeding UI. */
+const salaryAnnual = 175_000;
+
+/** Sample profile for demos/tests. */
 export const mockProfile: OnboardingAnswers = {
   employerMatch401k: "yes",
   hsaEligible: "yes",
-  incomeAbove161k: "yes",
-  taxBracket: "24",
   taxableBrokerage: "yes",
+  salaryAnnual,
+  incomeAbove161k: salaryAnnual > 161_000 ? "yes" : "no",
+  taxBracket: estimateTaxBracketFromSalary(salaryAnnual),
 };
+
