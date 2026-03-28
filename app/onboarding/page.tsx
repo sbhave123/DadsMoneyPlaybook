@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSessionUser } from "@/lib/auth";
-import { getOnboarding, setOnboarding } from "@/lib/storage";
+import { getOnboarding, persistOnboarding } from "@/lib/storage";
 import { estimateTaxBracketFromSalary } from "@/lib/tax";
 import type { OnboardingAnswers } from "@/lib/types";
 
@@ -36,6 +36,10 @@ type SalaryStep = {
 };
 
 type Step = ChoiceStep | SalaryStep;
+
+function stripCommas(s: string): string {
+  return s.replace(/,/g, "");
+}
 
 const STEPS: Step[] = [
   {
@@ -91,6 +95,7 @@ export default function OnboardingPage() {
   const [step, setStep] = React.useState(0);
   const [draft, setDraft] = React.useState<AnswersDraft>({});
   const [salaryInput, setSalaryInput] = React.useState("");
+  const [finishError, setFinishError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     try {
@@ -157,16 +162,18 @@ export default function OnboardingPage() {
 
   const canContinue =
     current.kind === "salary"
-      ? Number(salaryInput.replaceAll(",", "")) > 0
+      ? Number(stripCommas(salaryInput)) > 0
       : draft[current.key] !== undefined;
 
   function select(value: string) {
+    setFinishError(null);
     setDraft((prev) => ({ ...prev, [current.key]: value }));
   }
 
   function saveAndNext() {
+    setFinishError(null);
     if (current.kind === "salary") {
-      const parsed = Number(salaryInput.replaceAll(",", ""));
+      const parsed = Number(stripCommas(salaryInput));
       if (!Number.isFinite(parsed) || parsed <= 0) return;
       setDraft((prev) => ({ ...prev, salaryAnnual: parsed }));
     }
@@ -175,12 +182,13 @@ export default function OnboardingPage() {
       return;
     }
 
-    const salaryAnnual = Number(
-      (current.kind === "salary"
-        ? salaryInput
-        : String(draft.salaryAnnual ?? "0")
-      ).replaceAll(",", "")
-    );
+    const salaryRaw =
+      current.kind === "salary" ? salaryInput : String(draft.salaryAnnual ?? "0");
+    const salaryAnnual = Number(stripCommas(salaryRaw));
+    if (!Number.isFinite(salaryAnnual) || salaryAnnual <= 0) {
+      setFinishError("Salary is missing or invalid. Go back to the salary step.");
+      return;
+    }
 
     const completed: OnboardingAnswers = {
       employerMatch401k: (draft.employerMatch401k ?? "unsure") as Binary,
@@ -194,8 +202,19 @@ export default function OnboardingPage() {
       monthlyHsaContribution: 0,
     };
 
-    setOnboarding(completed);
-    router.push("/dashboard?tab=calendar");
+    const saved = persistOnboarding(completed);
+    if (!saved) {
+      setFinishError("Could not save your baseline. Please try again.");
+      return;
+    }
+
+    const dest = "/dashboard?tab=calendar";
+    router.push(dest);
+    window.setTimeout(() => {
+      if (window.location.pathname.startsWith("/onboarding")) {
+        window.location.assign(dest);
+      }
+    }, 2500);
   }
 
   function goBack() {
@@ -260,9 +279,10 @@ export default function OnboardingPage() {
               className="h-12 w-full rounded-rh border border-playbook-line bg-white px-3 text-base text-playbook-black outline-none ring-playbook-black/10 focus:ring-2"
               placeholder="e.g. 120000"
               value={salaryInput}
-              onChange={(e) =>
-                setSalaryInput(e.target.value.replace(/[^\d,]/g, ""))
-              }
+              onChange={(e) => {
+                setFinishError(null);
+                setSalaryInput(e.target.value.replace(/[^\d,]/g, ""));
+              }}
             />
             <p className="mt-2 text-xs text-playbook-muted">
               Used to estimate bracket only; this is not tax filing advice.
@@ -270,6 +290,12 @@ export default function OnboardingPage() {
           </div>
         )}
       </section>
+
+      {finishError ? (
+        <p className="mt-6 rounded-rh border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {finishError}
+        </p>
+      ) : null}
 
       <footer className="mt-10 flex gap-3">
         <Button
