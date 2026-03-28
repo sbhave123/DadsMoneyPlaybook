@@ -3,17 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --playbook-green: #1b4332;
-  --playbook-amber: #d97706;
-  --background: #f5f3ef;
-  --foreground: #1c1917;
+  --playbook-black: #0a0a0a;
+  --playbook-green: #b2d6b8;
+  --playbook-amber: #c27a2c;
+  --background: #f6f5f1;
+  --foreground: #0a0a0a;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

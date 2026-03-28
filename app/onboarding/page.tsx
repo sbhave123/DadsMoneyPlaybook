@@ -20,7 +20,7 @@ type AnswersDraft = {
   taxableBrokerage?: Brokerage;
 };
 
-type QuestionStep = {
+type ChoiceStep = {
   kind: "choice";
   key: "employerMatch401k" | "hsaEligible" | "taxableBrokerage";
   question: string;
@@ -35,7 +35,7 @@ type SalaryStep = {
   explainer: string;
 };
 
-type Step = QuestionStep | SalaryStep;
+type Step = ChoiceStep | SalaryStep;
 
 const STEPS: Step[] = [
   {
@@ -85,30 +85,70 @@ const STEPS: Step[] = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [ready, setReady] = React.useState(false);
+  const [gate, setGate] = React.useState<
+    "pending" | "signin" | "dashboard" | "ready"
+  >("pending");
   const [step, setStep] = React.useState(0);
   const [draft, setDraft] = React.useState<AnswersDraft>({});
   const [salaryInput, setSalaryInput] = React.useState("");
 
   React.useEffect(() => {
-    const user = getSessionUser();
-    if (!user) {
-      router.replace("/");
-      return;
+    try {
+      const user = getSessionUser();
+      if (!user) {
+        setGate("signin");
+        router.replace("/");
+        const hardNav = window.setTimeout(() => {
+          if (window.location.pathname.startsWith("/onboarding")) {
+            window.location.assign("/");
+          }
+        }, 2500);
+        return () => window.clearTimeout(hardNav);
+      }
+      const existing = getOnboarding();
+      if (existing) {
+        setGate("dashboard");
+        const dest = "/dashboard?tab=calendar";
+        router.replace(dest);
+        const hardNav = window.setTimeout(() => {
+          if (window.location.pathname.startsWith("/onboarding")) {
+            window.location.assign(dest);
+          }
+        }, 2500);
+        return () => window.clearTimeout(hardNav);
+      }
+      setGate("ready");
+    } catch {
+      setGate("ready");
     }
-    const existing = getOnboarding();
-    if (existing) {
-      router.replace("/dashboard");
-      return;
-    }
-    setReady(true);
   }, [router]);
 
-  if (!ready) {
+  if (gate !== "ready") {
     return (
-      <main className="mx-auto flex min-h-dvh max-w-app items-center justify-center px-5">
-        <p className="text-sm text-stone-500">Loading…</p>
-      </main>
+      <div className="min-h-dvh bg-playbook-surface">
+        <main className="mx-auto flex max-w-app flex-col items-center justify-center gap-3 px-5 py-16">
+          <p className="text-sm text-playbook-muted">
+            {gate === "pending"
+              ? "Loading…"
+              : gate === "signin"
+                ? "Taking you to sign in…"
+                : "Taking you to your dashboard…"}
+          </p>
+          {gate === "signin" || gate === "dashboard" ? (
+            <button
+              type="button"
+              className="text-xs font-medium text-playbook-black underline-offset-2 hover:underline"
+              onClick={() => {
+                window.location.assign(
+                  gate === "signin" ? "/" : "/dashboard?tab=calendar"
+                );
+              }}
+            >
+              Stuck? Continue in browser
+            </button>
+          ) : null}
+        </main>
+      </div>
     );
   }
 
@@ -149,10 +189,13 @@ export default function OnboardingPage() {
       salaryAnnual,
       taxBracket: estimateTaxBracketFromSalary(salaryAnnual),
       incomeAbove161k: salaryAnnual > 161_000 ? "yes" : "no",
+      monthlyTakeHome: 0,
+      monthly401kEmployee: 0,
+      monthlyHsaContribution: 0,
     };
 
     setOnboarding(completed);
-    router.push("/dashboard");
+    router.push("/dashboard?tab=calendar");
   }
 
   function goBack() {
@@ -160,21 +203,22 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="mx-auto min-h-dvh max-w-app px-5 pb-10 pt-8">
+    <div className="min-h-dvh bg-playbook-surface">
+      <main className="mx-auto max-w-app px-5 pb-12 pt-8">
       <header className="mb-8">
-        <p className="text-xs font-medium uppercase tracking-wider text-playbook-green/70">
-          Dad&apos;s Playbook
+        <p className="text-xs font-semibold uppercase tracking-wider text-playbook-muted">
+          One-time setup
         </p>
-        <h1 className="mt-1 text-2xl font-semibold text-playbook-green">
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-playbook-black">
           Let&apos;s set your baseline
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-stone-600">
-          We keep this practical, factual, and personalized to your inputs.
+        <p className="mt-2 text-sm leading-relaxed text-playbook-muted">
+          Short, factual prompts—no jargon, no lecture.
         </p>
         <div className="mt-5 space-y-2">
-          <div className="flex justify-between text-xs text-stone-500">
+          <div className="flex justify-between text-xs text-playbook-muted">
             <span>
-              Question {step + 1} of {STEPS.length}
+              Step {step + 1} of {STEPS.length}
             </span>
             <span>{progress}%</span>
           </div>
@@ -183,8 +227,8 @@ export default function OnboardingPage() {
       </header>
 
       <section>
-        <h2 className="text-lg font-medium text-stone-900">{current.question}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-stone-500">
+        <h2 className="text-lg font-medium text-playbook-black">{current.question}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-playbook-muted">
           {current.explainer}
         </p>
 
@@ -198,10 +242,10 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={() => select(opt.value)}
                   className={cn(
-                    "rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
+                    "rounded-rh border px-4 py-3.5 text-left text-sm font-semibold transition-colors",
                     selected
-                      ? "border-playbook-green bg-playbook-green/10 text-playbook-green"
-                      : "border-stone-200 bg-white text-stone-800 hover:border-playbook-green/30"
+                      ? "border-playbook-black bg-playbook-black text-white"
+                      : "border-playbook-line bg-white text-playbook-black hover:border-playbook-black/25"
                   )}
                 >
                   {opt.label}
@@ -213,14 +257,14 @@ export default function OnboardingPage() {
           <div className="mt-6">
             <input
               inputMode="numeric"
-              className="h-12 w-full rounded-xl border border-stone-200 bg-white px-3 text-base outline-none ring-playbook-green/25 focus:ring-2"
+              className="h-12 w-full rounded-rh border border-playbook-line bg-white px-3 text-base text-playbook-black outline-none ring-playbook-black/10 focus:ring-2"
               placeholder="e.g. 120000"
               value={salaryInput}
               onChange={(e) =>
                 setSalaryInput(e.target.value.replace(/[^\d,]/g, ""))
               }
             />
-            <p className="mt-2 text-xs text-stone-500">
+            <p className="mt-2 text-xs text-playbook-muted">
               Used to estimate bracket only; this is not tax filing advice.
             </p>
           </div>
@@ -231,7 +275,7 @@ export default function OnboardingPage() {
         <Button
           type="button"
           variant="ghost"
-          className="flex-1 text-stone-600"
+          className="flex-1 text-playbook-muted"
           onClick={goBack}
           disabled={step === 0}
         >
@@ -246,7 +290,8 @@ export default function OnboardingPage() {
           {step === STEPS.length - 1 ? "Finish" : "Continue"}
         </Button>
       </footer>
-    </main>
+      </main>
+    </div>
   );
 }
 

@@ -11,6 +11,12 @@ export type OnboardingAnswers = {
   salaryAnnual: number;
   taxBracket: TaxBracket;
   taxableBrokerage: TaxableBrokerage;
+  /** Average net pay deposited per month after tax, 401k, HSA, etc. */
+  monthlyTakeHome: number;
+  /** Your 401(k) employee deferral per month (payroll), for your records. */
+  monthly401kEmployee: number;
+  /** Your HSA contribution per month, for your records. */
+  monthlyHsaContribution: number;
 };
 
 export type TimelineAction = {

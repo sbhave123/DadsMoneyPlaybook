@@ -134,8 +134,8 @@ export function ChatDrawer({
       shouldScaleBackground={false}
     >
       <DrawerContent className="max-w-app md:max-w-[min(100%,380px)]">
-        <DrawerHeader className="border-b border-stone-200/80 px-4 pb-4 pt-2 text-left">
-          <DrawerTitle className="pr-8 text-playbook-green">
+        <DrawerHeader className="border-b border-playbook-line px-4 pb-4 pt-2 text-left">
+          <DrawerTitle className="pr-8 text-playbook-black">
             Ask Dad
           </DrawerTitle>
           <DrawerDescription className="line-clamp-2 text-left">
@@ -157,7 +157,7 @@ export function ChatDrawer({
             >
               {m.role === "assistant" && (
                 <div
-                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-playbook-amber text-xs font-bold text-white shadow-sm"
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-playbook-green text-xs font-bold text-playbook-black shadow-sm"
                   aria-hidden
                 >
                   D
@@ -167,8 +167,8 @@ export function ChatDrawer({
                 className={cn(
                   "max-w-[88%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-[15px] leading-relaxed shadow-sm",
                   m.role === "user"
-                    ? "rounded-br-md bg-playbook-green text-white"
-                    : "rounded-bl-md border border-stone-200/90 bg-white text-stone-800"
+                    ? "rounded-br-md bg-playbook-black text-white"
+                    : "rounded-bl-md border border-playbook-line bg-playbook-surface text-playbook-black"
                 )}
               >
                 {m.content}
@@ -178,14 +178,14 @@ export function ChatDrawer({
           {streaming ? (
             <div className="flex gap-2 justify-start">
               <div
-                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-playbook-amber text-xs font-bold text-white shadow-sm"
+                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-playbook-green text-xs font-bold text-playbook-black shadow-sm"
                 aria-hidden
               >
                 D
               </div>
-              <div className="max-w-[88%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-stone-200/90 bg-white px-3.5 py-2.5 text-[15px] leading-relaxed text-stone-800 shadow-sm">
+              <div className="max-w-[88%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-playbook-line bg-playbook-surface px-3.5 py-2.5 text-[15px] leading-relaxed text-playbook-black shadow-sm">
                 {streaming}
-                <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-playbook-amber align-middle" />
+                <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-playbook-green align-middle" />
               </div>
             </div>
           ) : null}
@@ -201,11 +201,11 @@ export function ChatDrawer({
 
         <form
           onSubmit={handleSend}
-          className="border-t border-stone-200/80 bg-[#f7f6f2]/95 p-3 backdrop-blur-sm"
+          className="border-t border-playbook-line bg-white/95 p-3 backdrop-blur-sm"
         >
           <div className="flex gap-2">
             <input
-              className="min-h-11 flex-1 rounded-xl border border-stone-200 bg-white px-3 text-[15px] text-stone-900 shadow-inner outline-none ring-playbook-green/25 placeholder:text-stone-400 focus:ring-2"
+              className="min-h-11 flex-1 rounded-rh border border-playbook-line bg-white px-3 text-[15px] text-playbook-black shadow-inner outline-none ring-playbook-black/10 placeholder:text-playbook-muted focus:ring-2"
               placeholder="Ask a follow-up…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -215,7 +215,7 @@ export function ChatDrawer({
             <Button
               type="submit"
               size="icon"
-              className="h-11 w-11 shrink-0 rounded-xl"
+              className="h-11 w-11 shrink-0 rounded-full"
               disabled={loading || !input.trim() || !action}
               aria-label="Send"
             >

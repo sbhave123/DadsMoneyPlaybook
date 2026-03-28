@@ -1,5 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { DM_Sans } from "next/font/google";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Dad's Playbook",
@@ -10,7 +18,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#1B4332",
+  themeColor: "#B2D6B8",
 };
 
 export default function RootLayout({
@@ -19,8 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-dvh antialiased">{children}</body>
+    <html lang="en" className={dmSans.variable}>
+      <body className="min-h-dvh font-sans antialiased">
+        <SiteNav />
+        {children}
+      </body>
     </html>
   );
 }

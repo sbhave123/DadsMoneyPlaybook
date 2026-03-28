@@ -11,5 +11,8 @@ export const mockProfile: OnboardingAnswers = {
   salaryAnnual,
   incomeAbove161k: salaryAnnual > 161_000 ? "yes" : "no",
   taxBracket: estimateTaxBracketFromSalary(salaryAnnual),
+  monthlyTakeHome: 8_200,
+  monthly401kEmployee: 1_458,
+  monthlyHsaContribution: 292,
 };
 

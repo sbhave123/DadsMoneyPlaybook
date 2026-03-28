@@ -26,6 +26,10 @@ function normalizeOnboarding(
 
   if (!employerMatch401k || !hsaEligible || !taxableBrokerage) return null;
 
+  const monthlyTakeHome = Math.max(0, Number(input.monthlyTakeHome ?? 0));
+  const monthly401kEmployee = Math.max(0, Number(input.monthly401kEmployee ?? 0));
+  const monthlyHsaContribution = Math.max(0, Number(input.monthlyHsaContribution ?? 0));
+
   return {
     employerMatch401k,
     hsaEligible,
@@ -33,7 +37,18 @@ function normalizeOnboarding(
     salaryAnnual: hasSalary ? salaryAnnual : 0,
     taxBracket,
     incomeAbove161k,
+    monthlyTakeHome,
+    monthly401kEmployee,
+    monthlyHsaContribution,
   };
+}
+
+/** Normalize and write full profile (e.g. from About Me). */
+export function persistOnboarding(answers: OnboardingAnswers): OnboardingAnswers | null {
+  const n = normalizeOnboarding(answers);
+  if (!n) return null;
+  setOnboarding(n);
+  return n;
 }
 
 export function getOnboarding(): OnboardingAnswers | null {

@@ -45,12 +45,12 @@ export function MonthlyModal({
       >
         <DialogHeader>
           <DialogTitle>It&apos;s {label}</DialogTitle>
-          <DialogDescription className="text-base text-stone-600">
+          <DialogDescription className="text-base text-playbook-muted">
             Here&apos;s what your dad would remind you to do this month:
           </DialogDescription>
         </DialogHeader>
         {actions.length === 0 ? (
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-playbook-muted">
             Nothing on your playbook for this month — enjoy the calm, and
             check back next month.
           </p>
@@ -59,10 +59,10 @@ export function MonthlyModal({
             {actions.map((a) => (
               <li
                 key={a.id}
-                className="rounded-xl border border-stone-200/80 bg-white/80 px-3 py-2.5"
+                className="rounded-rh border border-playbook-line bg-playbook-surface px-3 py-2.5"
               >
-                <p className="font-semibold text-playbook-green">{a.title}</p>
-                <p className="mt-1 text-sm text-stone-500">{a.explanation}</p>
+                <p className="font-semibold text-playbook-black">{a.title}</p>
+                <p className="mt-1 text-sm text-playbook-muted">{a.explanation}</p>
               </li>
             ))}
           </ul>
