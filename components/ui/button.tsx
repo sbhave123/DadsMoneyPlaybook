@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-playbook-green text-playbook-black shadow-sm hover:bg-playbook-green-strong active:brightness-[0.95]",
+          "bg-playbook-blue text-playbook-black shadow-sm hover:bg-playbook-blue-strong active:brightness-[0.95]",
         secondary:
           "border border-playbook-black/15 bg-white text-playbook-black shadow-sm hover:bg-playbook-surface",
         ghost: "text-playbook-black hover:bg-black/5",

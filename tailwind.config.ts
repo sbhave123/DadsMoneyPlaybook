@@ -18,6 +18,9 @@ const config: Config = {
           /* Pistachio accent */
           green: "#B2D6B8",
           "green-strong": "#8FC49A",
+          /* Primary CTA (light blue) */
+          blue: "#A8D4E8",
+          "blue-strong": "#7EB8D9",
           surface: "#F6F5F1",
           line: "#E8E6E0",
           muted: "#5C5C5C",
